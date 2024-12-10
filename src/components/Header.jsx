@@ -15,7 +15,9 @@ function Header() {
     return (
         <Navbar bg="light" expand="lg">
             <Container>
-                <Navbar.Brand as={Link} to="/">Nexus</Navbar.Brand>
+                <Navbar.Brand as={Link} to={isAuthenticated ? "/blog" : "/"}>
+                    Nexus
+                </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
@@ -26,7 +28,10 @@ function Header() {
                                 <Nav.Link as={Link} to="/contact">Contact</Nav.Link>
                             </>
                         ) : (
-                            <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
+                            <>
+                                <Nav.Link as={Link} to="/profile">Profile</Nav.Link>
+                                <Nav.Link as={Link} to="/add-blog">Add Blog</Nav.Link>
+                            </>
                         )}
                     </Nav>
                     <Nav>

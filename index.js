@@ -127,20 +127,19 @@ app.post('/api/login', async (req, res) => {
 
 
 // Add a new blog
-app.post('/api/blogs', async (req, res) => {
+app.post('/api/blogs', upload.single('image'), async (req, res) => {
     try {
-        const {
-            title, category, content, image, privacy, status, user_id
-        } = req.body;
+        const { title, category, content, privacy, status, user_id } = req.body;
+        const image = req.file ? req.file.buffer : null; // Handle optional image
 
         const blogId = await blogModel.addBlog({
             title,
             category,
             content,
-            image: Buffer.from(image, 'base64'), // Convert base64 to binary
+            image,
             privacy,
             status,
-            user_id
+            user_id,
         });
 
         res.status(201).json({ success: true, blogId });
@@ -149,6 +148,7 @@ app.post('/api/blogs', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });
+
 
 // Fetch all blogs with optional filters
 app.get('/api/blogs', async (req, res) => {

@@ -30,23 +30,32 @@ class Blog {
 
     // Fetch all blogs with optional filters (e.g., privacy, user_id)
     async fetchBlogs(filters = {}) {
-        let sql = `SELECT * FROM blogs WHERE 1=1`;
+        let sql = `
+            SELECT 
+                blogs.*, 
+                CONCAT(users.first_name, ' ', users.last_name) AS author
+            FROM blogs
+            INNER JOIN users ON blogs.user_id = users.id
+            WHERE 1=1
+        `;
         const params = [];
-
+    
         // Apply filters if provided
         if (filters.privacy) {
-            sql += ` AND privacy = ?`;
+            sql += ` AND blogs.privacy = ?`;
             params.push(filters.privacy);
         }
         if (filters.user_id) {
-            sql += ` AND user_id = ?`;
+            sql += ` AND blogs.user_id = ?`;
             params.push(filters.user_id);
         }
-        sql += ` ORDER BY created_at DESC`; // Latest blogs first
-
+    
+        sql += ` ORDER BY blogs.created_at DESC`; // Latest blogs first
+    
         const [rows] = await this.db.execute(sql, params);
         return rows;
     }
+    
 
     // Fetch a single blog by ID
     async fetchBlogById(blogId) {

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Buffer } from 'buffer';
 import { Container, Row, Col, Card, Spinner, Alert } from 'react-bootstrap';
 
 function BlogList() {
@@ -11,7 +12,19 @@ function BlogList() {
         const fetchBlogs = async () => {
             try {
                 const response = await axios.get('http://localhost:3000/api/blogs'); // Replace with your API endpoint
-                setBlogs(response.data);
+
+                // Parse the image blob into a base64 string
+                const parsedBlogs = response.data.map((blog) => ({
+                    ...blog,
+                    image: blog.image
+                        ? `data:image/jpeg;base64,${Buffer.from(blog.image.data).toString('base64')}`
+                        : null,
+                }));
+
+                console.log('Parsed blogs:', parsedBlogs);
+                
+
+                setBlogs(parsedBlogs);
                 setLoading(false);
             } catch (error) {
                 console.error('Error fetching blogs:', error);
@@ -48,7 +61,8 @@ function BlogList() {
                         blogs.map((blog) => (
                             <Card className="mb-4" key={blog.id}>
                                 <Card.Header>
-                                    <strong>{blog.author}</strong> - <small>{new Date(blog.created_at).toLocaleString()}</small>
+                                    <strong>{blog.author || 'Unknown Author'}</strong> -{' '}
+                                    <small>{new Date(blog.created_at).toLocaleString()}</small>
                                 </Card.Header>
                                 {blog.image && (
                                     <Card.Img variant="top" src={blog.image} alt={blog.title} />
