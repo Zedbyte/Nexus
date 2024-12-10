@@ -131,7 +131,7 @@ function Home() {
                             <img
                                 src={`data:image/jpeg;base64,${Buffer.from(selectedBlog.image.data).toString('base64')}`}
                                 alt={selectedBlog.title}
-                                className="img-fluid mb-3 w-100 object-contain"
+                                className="img-fluid mb-3 w-50 object-cover"
                             />
                         </div>
                     )}

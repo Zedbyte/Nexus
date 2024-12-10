@@ -13,6 +13,7 @@ import Contact from './pages/Contact';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import EditProfile from './pages/EditProfile';
 // END Pages
 
 // Bootstrap
@@ -43,6 +44,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/edit-profile/:id" element={<EditProfile />} />
             </Routes>
         </Router>
       </AuthProvider>

@@ -27,8 +27,13 @@ app.options('*', (req, res) => {
     res.status(204).end();
 });
 
+// Increase payload size limit
+app.use(express.json({ limit: '50mb' })); // Adjust size as needed
+app.use(express.urlencoded({ limit: '50mb', extended: true })); // For form-encoded data
+
 // Middleware
 app.use(bodyParser.json()); 
+
 
 const userModel = new User();
 const blogModel = new Blog();
@@ -47,7 +52,7 @@ app.post('/api/users', upload.single('profile_picture'), async (req, res) => {
     try {
         const { first_name, last_name, username, phone_number, email_address, password, bio } = req.body;
         const profile_picture = req.file ? req.file.buffer : null; // Get the binary data
-
+        
         const userId = await userModel.save({
             first_name,
             last_name,
@@ -324,6 +329,88 @@ app.get('/api/profile/:id', async (req, res) => {
         res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });
+
+
+app.get('/api/profile/fill/:id', async (req, res) => {
+    try {
+        const userId = req.params.id;
+
+        // Fetch user data from the model
+        const user = await userModel.getUser(userId);
+
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'User not found' });
+        }
+        
+        // Safely access profile_picture
+        const profilePicture = user.profile_picture;
+        const profilePictureBase64 = 
+        profilePicture && profilePicture
+        ? `data:image/jpeg;base64,${Buffer.from(profilePicture).toString('base64')}`
+        : null;
+
+
+        // Format the user profile data
+        const userProfile = {
+            id: user.id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            profile_picture: profilePictureBase64,
+            email_address: user.email_address,
+            phone_number: user.phone_number,
+            username: user.username,
+            bio: user.bio || 'No bio provided.',
+        };
+
+        res.status(200).json({ success: true, data: userProfile });
+    } catch (error) {
+        console.error('Error fetching user profile:', error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+
+// const uploadImageUpdate = multer({ limits: { fileSize: 10 * 1024 * 1024 } }); // Limit to 10MB
+// Update user profile
+app.put('/api/profile/:id', upload.single('profile_picture'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { first_name, last_name, email_address, phone_number, username, password, bio } = req.body;
+
+        // Use req.file.buffer to get the binary data of the uploaded file
+        const profile_picture = req.file ? req.file.buffer : null;
+
+        console.log(req);
+        
+
+        // Validate input
+        if (!first_name || !last_name || !email_address || !phone_number || !username || !password) {
+            return res.status(400).json({ success: false, error: 'All required fields must be filled.' });
+        }
+
+        // Update user in the database
+        const updateResult = await userModel.update(id, {
+            first_name,
+            last_name,
+            email_address,
+            phone_number,
+            username,
+            password,
+            bio,
+            profile_picture, // Include binary data for profile_picture
+        });
+
+        if (!updateResult) {
+            return res.status(404).json({ success: false, error: 'User not found.' });
+        }
+
+        res.status(200).json({ success: true, message: 'Profile updated successfully.' });
+    } catch (error) {
+        console.error('Error updating profile:', error.message);
+        res.status(500).json({ success: false, error: 'Internal server error.' });
+    }
+});
+
 
 // Start Server
 app.listen(PORT, () => {

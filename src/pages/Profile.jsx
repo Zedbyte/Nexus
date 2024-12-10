@@ -64,26 +64,6 @@ function Profile() {
         fetchProfileAndBlogs();
     }, []);
 
-    const handleSeePassword = async () => {
-        setLoginError('');
-        
-        try {
-            const response = await axios.post('http://localhost:3000/api/login', {
-                usernameOrEmail: profile.email,
-                password: password,
-            });
-
-            if (response.data.success) {
-                setRevealedPassword(password);
-            } else {
-                setLoginError('Incorrect password.');
-            }
-        } catch (error) {
-            console.error('Error verifying password:', error);
-            setLoginError('Invalid Password.');
-        }
-    };
-
     if (loading) {
         return (
             <Container className="mt-4 text-center">
@@ -124,24 +104,15 @@ function Profile() {
 
                             {/* See Password Feature */}
                             <Form>
-                                <Form.Group className="mb-3" controlId="passwordInput">
-                                    <Form.Label>Enter Password to Reveal:</Form.Label>
-                                    <Form.Control
-                                        type="password"
-                                        placeholder="Enter your password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                    />
-                                </Form.Group>
-                                <Button variant="primary" onClick={handleSeePassword}>
-                                    Verify and Reveal
-                                </Button>
-                                {loginError && <Alert className="mt-3" variant="danger">{loginError}</Alert>}
-                                {revealedPassword && (
-                                    <Alert className="mt-3" variant="success">
-                                        Your password is: <strong>{revealedPassword}</strong>
-                                    </Alert>
-                                )}
+                                <div className="d-flex gap-2 justify-content-center">
+
+                                    <Button
+                                        variant="secondary"
+                                        onClick={() => window.location.href = `/edit-profile/${profile.id}`} // Redirect to Edit Profile
+                                    >
+                                        Edit Profile
+                                    </Button>
+                                </div>
                             </Form>
                         </Card.Body>
                     </Card>
