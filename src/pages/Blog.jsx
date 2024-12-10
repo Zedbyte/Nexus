@@ -138,7 +138,7 @@ function Blog() {
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
-                            <Form.Label>Image (optional)</Form.Label>
+                            <Form.Label>Image</Form.Label>
                             <Form.Control
                                 type="file"
                                 accept="image/*"
