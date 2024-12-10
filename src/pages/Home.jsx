@@ -120,18 +120,20 @@ function Home() {
                 show={showModal}
                 onHide={handleCloseModal}
                 centered
-                dialogClassName={`custom-modal ${fadeIn ? 'fade-in' : 'fade-out'}`} // Apply animation classes
+                dialogClassName={`custom-modal custom-modal-wide ${fadeIn ? 'fade-in' : 'fade-out'}`} // Apply animation classes
             >
                 <Modal.Header closeButton>
                     <Modal.Title>{selectedBlog?.title}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body style={{ maxHeight: '70vh', overflowY: 'auto' }}>
                     {selectedBlog?.image && (
-                        <img
-                            src={`data:image/jpeg;base64,${Buffer.from(selectedBlog.image.data).toString('base64')}`}
-                            alt={selectedBlog.title}
-                            className="img-fluid mb-3"
-                        />
+                        <div className="text-center">
+                            <img
+                                src={`data:image/jpeg;base64,${Buffer.from(selectedBlog.image.data).toString('base64')}`}
+                                alt={selectedBlog.title}
+                                className="img-fluid mb-3 w-100 object-contain"
+                            />
+                        </div>
                     )}
                     <div dangerouslySetInnerHTML={{ __html: selectedBlog?.content }} />
                 </Modal.Body>
@@ -142,6 +144,7 @@ function Home() {
                     </small>
                 </Modal.Footer>
             </Modal>
+
         </Container>
     );
 }
