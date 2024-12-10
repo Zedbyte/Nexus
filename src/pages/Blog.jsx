@@ -27,6 +27,7 @@ function Blog() {
         setError('');
         setSuccess('');
     
+        // Validate required fields
         if (!title || !content || !category) {
             setError('Title, content, and category are required.');
             return;
@@ -38,24 +39,31 @@ function Blog() {
             formData.append('category', category);
             formData.append('content', content);
     
-            // Add image only if it exists
-            if (image) {
-                formData.append('image', image);
-            }
+            // Add image if available
+            if (image) formData.append('image', image);
     
             formData.append('privacy', privacy);
             formData.append('status', status);
-            formData.append('user_id', 1); // Replace with dynamic user ID if needed
+    
+            // Dynamically fetch user ID from local storage or context
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user && user.id) {
+                formData.append('user_id', user.id);
+            } else {
+                setError('User not authenticated. Please log in.');
+                return;
+            }
     
             const response = await axios.post('http://localhost:3000/api/blogs', formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data', // Required for file uploads
+                    'Content-Type': 'multipart/form-data',
                 },
             });
     
             if (response.data.success) {
                 setSuccess('Blog post added successfully!');
-                setPosts([...posts, response.data]); // Add new post to the list
+                setPosts((prevPosts) => [...prevPosts, response.data]); // Add new post to the list
+                // Reset form fields
                 setTitle('');
                 setCategory('');
                 setContent('');
@@ -70,6 +78,7 @@ function Blog() {
             setError('An error occurred while submitting the blog post.');
         }
     };
+    
     
 
     return (

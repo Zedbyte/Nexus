@@ -36,18 +36,23 @@ class Blog {
                 CONCAT(users.first_name, ' ', users.last_name) AS author
             FROM blogs
             INNER JOIN users ON blogs.user_id = users.id
-            WHERE 1=1
+            WHERE (
+                blogs.privacy = 'public'
         `;
         const params = [];
     
-        // Apply filters if provided
+        // Include user-specific blogs if user_id is provided
+        if (filters.user_id) {
+            sql += ` OR blogs.user_id = ?`;
+            params.push(filters.user_id);
+        }
+    
+        sql += `)`;
+    
+        // Apply specific privacy filter if provided
         if (filters.privacy) {
             sql += ` AND blogs.privacy = ?`;
             params.push(filters.privacy);
-        }
-        if (filters.user_id) {
-            sql += ` AND blogs.user_id = ?`;
-            params.push(filters.user_id);
         }
     
         sql += ` ORDER BY blogs.created_at DESC`; // Latest blogs first

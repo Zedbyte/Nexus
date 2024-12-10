@@ -1,88 +1,67 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
+import React from 'react';
+import { useForm, ValidationError } from '@formspree/react';
+import { Container, Form, Button, Alert } from 'react-bootstrap';
 
-function Contact() {
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        subject: '',
-        message: ''
-    });
-    const [submitted, setSubmitted] = useState(false);
-
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Here you would typically send the form data to your backend
-        console.log('Form submitted', formData);
-        setSubmitted(true);
-    };
+function ContactForm() {
+    const [state, handleSubmit] = useForm("mgveblvv"); // Replace with your Formspree form ID
 
     return (
         <Container className="mt-4">
-        <Row>
-            <Col md={6} className="mx-auto">
             <h2>Contact Us</h2>
-            {submitted ? (
-                <Alert variant="success">
-                Thank you for your message. We'll get back to you soon!
-                </Alert>
+            {state.succeeded ? (
+                <Alert variant="success">Thank you! Your message has been sent.</Alert>
             ) : (
                 <Form onSubmit={handleSubmit}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Name</Form.Label>
-                    <Form.Control
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Email</Form.Label>
-                    <Form.Control
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Subject</Form.Label>
-                    <Form.Control
-                    type="text"
-                    name="subject"
-                    value={formData.subject}
-                    onChange={handleChange}
-                    required
-                    />
-                </Form.Group>
-                <Form.Group className="mb-3">
-                    <Form.Label>Message</Form.Label>
-                    <Form.Control
-                    as="textarea"
-                    rows={3}
-                    name="message"
-                    value={formData.message}
-                    onChange={handleChange}
-                    required
-                    />
-                </Form.Group>
-                <Button variant="primary" type="submit">
-                    Send Message
-                </Button>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="name">Name</Form.Label>
+                        <Form.Control
+                            id="name"
+                            type="text"
+                            name="name"
+                            required
+                        />
+                        <ValidationError 
+                            prefix="Name" 
+                            field="name"
+                            errors={state.errors}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="email">Email</Form.Label>
+                        <Form.Control
+                            id="email"
+                            type="email"
+                            name="email"
+                            required
+                        />
+                        <ValidationError 
+                            prefix="Email" 
+                            field="email"
+                            errors={state.errors}
+                        />
+                    </Form.Group>
+                    <Form.Group className="mb-3">
+                        <Form.Label htmlFor="message">Message</Form.Label>
+                        <Form.Control
+                            id="message"
+                            as="textarea"
+                            name="message"
+                            rows={5}
+                            required
+                        />
+                        <ValidationError 
+                            prefix="Message" 
+                            field="message"
+                            errors={state.errors}
+                        />
+                    </Form.Group>
+                    <Button type="submit" disabled={state.submitting}>
+                        Send
+                    </Button>
                 </Form>
             )}
-            </Col>
-        </Row>
         </Container>
     );
 }
 
-export default Contact;
-
+export default ContactForm;

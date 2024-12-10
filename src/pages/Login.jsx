@@ -20,8 +20,13 @@ function Login() {
                 usernameOrEmail: email,
                 password,
             });
-
             if (response.data.success) {
+
+                const user = response.data.user;
+
+                // Save user data in local storage or a global state
+                localStorage.setItem('user', JSON.stringify(user));
+
                 login(); // Update auth state
                 navigate('/blog'); // Redirect to blog route
             } else {

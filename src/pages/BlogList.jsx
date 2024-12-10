@@ -3,6 +3,13 @@ import axios from 'axios';
 import { Buffer } from 'buffer';
 import { Container, Row, Col, Card, Spinner, Alert } from 'react-bootstrap';
 
+// Utility function to parse image data
+const parseImage = (imageData) => {
+    return imageData
+        ? `data:image/jpeg;base64,${Buffer.from(imageData.data).toString('base64')}`
+        : null;
+};
+
 function BlogList() {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -10,25 +17,36 @@ function BlogList() {
 
     useEffect(() => {
         const fetchBlogs = async () => {
-            try {
-                const response = await axios.get('http://localhost:3000/api/blogs'); // Replace with your API endpoint
+            setLoading(true);
+            setError('');
 
-                // Parse the image blob into a base64 string
+            try {
+                // Fetch user data from local storage
+                const user = JSON.parse(localStorage.getItem('user'));
+                if (!user || !user.id) {
+                    setError('User not authenticated. Please log in.');
+                    setLoading(false);
+                    return;
+                }
+
+                // Make the API call with the user_id as a query parameter
+                const response = await axios.get('http://localhost:3000/api/blogs', {
+                    params: {
+                        user_id: user.id,
+                    },
+                });
+
+                // Parse blogs and images
                 const parsedBlogs = response.data.map((blog) => ({
                     ...blog,
-                    image: blog.image
-                        ? `data:image/jpeg;base64,${Buffer.from(blog.image.data).toString('base64')}`
-                        : null,
+                    image: parseImage(blog.image),
                 }));
 
-                console.log('Parsed blogs:', parsedBlogs);
-                
-
                 setBlogs(parsedBlogs);
-                setLoading(false);
             } catch (error) {
                 console.error('Error fetching blogs:', error);
                 setError('Failed to load blogs. Please try again later.');
+            } finally {
                 setLoading(false);
             }
         };
