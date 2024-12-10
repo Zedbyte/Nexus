@@ -1,17 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Form, Button, Card, Alert } from 'react-bootstrap';
+import JoditEditor from 'jodit-react';
 
 function Blog() {
     const [posts, setPosts] = useState([]);
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('');
-    const [content, setContent] = useState('');
+    // const [content, setContent] = useState('');
     const [image, setImage] = useState(null);
     const [privacy, setPrivacy] = useState('public');
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const editor = useRef(null);
+	const [content, setContent] = useState('');
+
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -125,12 +129,12 @@ function Blog() {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Content</Form.Label>
-                            <Form.Control
-                                as="textarea"
-                                rows={3}
+                            <JoditEditor
+                                ref={editor}
                                 value={content}
-                                onChange={(e) => setContent(e.target.value)}
-                                required
+                                tabIndex={1} // tabIndex of textarea
+                                onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
+                                onChange={newContent => {}}
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">

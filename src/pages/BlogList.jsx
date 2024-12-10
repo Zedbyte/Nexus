@@ -87,7 +87,11 @@ function BlogList() {
                                 )}
                                 <Card.Body>
                                     <Card.Title>{blog.title}</Card.Title>
-                                    <Card.Text>{blog.content}</Card.Text>
+                                    {/* Render blog content as HTML */}
+                                    <div
+                                        className="blog-content"
+                                        dangerouslySetInnerHTML={{ __html: blog.content }}
+                                    />
                                 </Card.Body>
                             </Card>
                         ))
