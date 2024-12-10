@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 import { Buffer } from 'buffer';
-import { Container, Row, Col, Card, Spinner, Alert, Image, Form, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Alert, Image, Form, Button, Modal } from 'react-bootstrap';
 
 // Utility function to parse image data
 const parseImage = (imageData) => {
@@ -15,9 +16,9 @@ function Profile() {
     const [blogs, setBlogs] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const [password, setPassword] = useState('');
-    const [revealedPassword, setRevealedPassword] = useState(null);
-    const [loginError, setLoginError] = useState('');
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [selectedBlogId, setSelectedBlogId] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfileAndBlogs = async () => {
@@ -64,6 +65,22 @@ function Profile() {
         fetchProfileAndBlogs();
     }, []);
 
+    const handleDeleteClick = (blogId) => {
+        setSelectedBlogId(blogId);
+        setShowDeleteModal(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        try {
+            await axios.delete(`http://localhost:3000/api/blogs/${selectedBlogId}`);
+            setBlogs((prevBlogs) => prevBlogs.filter((blog) => blog.id !== selectedBlogId));
+            setShowDeleteModal(false);
+        } catch (error) {
+            console.error('Error deleting blog:', error);
+            setError('Failed to delete blog. Please try again.');
+        }
+    };
+
     if (loading) {
         return (
             <Container className="mt-4 text-center">
@@ -102,13 +119,11 @@ function Profile() {
                             <p className="text-muted">{profile.phone_number}</p>
                             <p className="text-muted">{profile.bio || 'No bio provided.'}</p>
 
-                            {/* See Password Feature */}
                             <Form>
                                 <div className="d-flex gap-2 justify-content-center">
-
                                     <Button
                                         variant="secondary"
-                                        onClick={() => window.location.href = `/edit-profile/${profile.id}`} // Redirect to Edit Profile
+                                        onClick={() => navigate(`/edit-profile/${profile.id}`)}
                                     >
                                         Edit Profile
                                     </Button>
@@ -122,9 +137,33 @@ function Profile() {
                     {blogs.length > 0 ? (
                         blogs.map((blog) => (
                             <Card className="mb-4 shadow-sm" key={blog.id}>
-                                <Card.Header>
-                                    <strong>{blog.title}</strong> -{' '}
-                                    <small>{new Date(blog.created_at).toLocaleString()}</small>
+                                <Card.Header className="d-flex justify-content-between align-items-center">
+                                    <strong>{blog.title}</strong>
+                                    <div>
+                                        <Button
+                                            variant="info"
+                                            size="sm"
+                                            className="me-2"
+                                            onClick={() => navigate(`/view-blog/${blog.id}`)}
+                                        >
+                                            View
+                                        </Button>
+                                        <Button
+                                            variant="warning"
+                                            size="sm"
+                                            className="me-2"
+                                            onClick={() => navigate(`/edit-blog/${blog.id}`)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <Button
+                                            variant="danger"
+                                            size="sm"
+                                            onClick={() => handleDeleteClick(blog.id)}
+                                        >
+                                            Delete
+                                        </Button>
+                                    </div>
                                 </Card.Header>
                                 {blog.image && (
                                     <Card.Img variant="top" src={blog.image} alt={blog.title} />
@@ -142,6 +181,26 @@ function Profile() {
                     )}
                 </Col>
             </Row>
+
+            {/* Delete Modal */}
+            <Modal
+                show={showDeleteModal}
+                onHide={() => setShowDeleteModal(false)}
+                centered
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure you want to delete this blog? This action cannot be undone.</Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={handleConfirmDelete}>
+                        Delete
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     );
 }

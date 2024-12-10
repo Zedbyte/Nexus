@@ -14,6 +14,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
+import ViewBlog from './pages/ViewBlog';
+import EditBlog from './pages/EditBlog';
 // END Pages
 
 // Bootstrap
@@ -34,22 +36,25 @@ function App() {
     <>
       <AuthProvider>
         <Router>
-            <Header />
-            <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/blog" element={<BlogList />} />
-                <Route path="/add-blog" element={<Blog />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/edit-profile/:id" element={<EditProfile />} />
-            </Routes>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/blog" element={<BlogList />} />
+            <Route path="/add-blog" element={<Blog />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/edit-profile/:id" element={<EditProfile />} />
+            <Route path="/view-blog/:id" element={<ViewBlog />} />
+            <Route path="/edit-blog/:id" element={<EditBlog />} />
+          </Routes>
         </Router>
       </AuthProvider>
     </>
-  )
+  );
 }
+
 
 export default App

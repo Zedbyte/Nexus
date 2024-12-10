@@ -52,7 +52,7 @@ app.post('/api/users', upload.single('profile_picture'), async (req, res) => {
     try {
         const { first_name, last_name, username, phone_number, email_address, password, bio } = req.body;
         const profile_picture = req.file ? req.file.buffer : null; // Get the binary data
-        
+
         const userId = await userModel.save({
             first_name,
             last_name,
@@ -241,20 +241,25 @@ app.get('/api/blogs/:id', async (req, res) => {
 });
 
 // Update a blog
-app.put('/api/blogs/:id', async (req, res) => {
+app.put('/api/blogs/:id', upload.single('image'), async (req, res) => {
     try {
         const blogId = req.params.id;
-        const {
-            title, category, content, image, privacy, status
-        } = req.body;
+        const { title, category, content, privacy, status } = req.body;
 
+        // Handle the uploaded image
+        const imageBuffer = req.file ? req.file.buffer : null; // Get the binary data of the image
+
+        console.log('Image buffer:', req);
+        
+
+        // Update the blog in the database
         const isUpdated = await blogModel.updateBlog(blogId, {
             title,
             category,
             content,
-            image: Buffer.from(image, 'base64'), // Convert base64 to binary
+            image: imageBuffer, // Pass binary data
             privacy,
-            status
+            status,
         });
 
         if (!isUpdated) {
@@ -379,9 +384,6 @@ app.put('/api/profile/:id', upload.single('profile_picture'), async (req, res) =
 
         // Use req.file.buffer to get the binary data of the uploaded file
         const profile_picture = req.file ? req.file.buffer : null;
-
-        console.log(req);
-        
 
         // Validate input
         if (!first_name || !last_name || !email_address || !phone_number || !username || !password) {
