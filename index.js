@@ -5,6 +5,7 @@ import multer from 'multer';
 
 // Import other modules as needed
 import User from './src/models/User.js';
+import Blog from './src/models/Blog.js';
 
 const app = express();
 const PORT = 3000;
@@ -30,6 +31,7 @@ app.options('*', (req, res) => {
 app.use(bodyParser.json()); 
 
 const userModel = new User();
+const blogModel = new Blog();
 
 // Configure multer for file uploads
 const upload = multer({ storage: multer.memoryStorage() }); // Store file in memory as Buffer
@@ -120,6 +122,110 @@ app.post('/api/login', async (req, res) => {
     } catch (error) {
         console.error('Error during authentication:', error.message);
         res.status(401).json({ success: false, error: error.message });
+    }
+});
+
+
+// Add a new blog
+app.post('/api/blogs', async (req, res) => {
+    try {
+        const {
+            title, category, content, image, privacy, status, user_id
+        } = req.body;
+
+        const blogId = await blogModel.addBlog({
+            title,
+            category,
+            content,
+            image: Buffer.from(image, 'base64'), // Convert base64 to binary
+            privacy,
+            status,
+            user_id
+        });
+
+        res.status(201).json({ success: true, blogId });
+    } catch (error) {
+        console.error('Error adding blog:', error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+// Fetch all blogs with optional filters
+app.get('/api/blogs', async (req, res) => {
+    try {
+        const filters = {
+            privacy: req.query.privacy,
+            user_id: req.query.user_id
+        };
+
+        const blogs = await blogModel.fetchBlogs(filters);
+        res.status(200).json(blogs);
+    } catch (error) {
+        console.error('Error fetching blogs:', error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+// Fetch a single blog by ID
+app.get('/api/blogs/:id', async (req, res) => {
+    try {
+        const blogId = req.params.id;
+        const blog = await blogModel.fetchBlogById(blogId);
+
+        if (!blog) {
+            return res.status(404).json({ success: false, error: 'Blog not found' });
+        }
+
+        res.status(200).json(blog);
+    } catch (error) {
+        console.error('Error fetching blog:', error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+// Update a blog
+app.put('/api/blogs/:id', async (req, res) => {
+    try {
+        const blogId = req.params.id;
+        const {
+            title, category, content, image, privacy, status
+        } = req.body;
+
+        const isUpdated = await blogModel.updateBlog(blogId, {
+            title,
+            category,
+            content,
+            image: Buffer.from(image, 'base64'), // Convert base64 to binary
+            privacy,
+            status
+        });
+
+        if (!isUpdated) {
+            return res.status(404).json({ success: false, error: 'Blog not found' });
+        }
+
+        res.status(200).json({ success: true, message: 'Blog updated successfully' });
+    } catch (error) {
+        console.error('Error updating blog:', error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
+    }
+});
+
+// Delete a blog
+app.delete('/api/blogs/:id', async (req, res) => {
+    try {
+        const blogId = req.params.id;
+
+        const isDeleted = await blogModel.deleteBlog(blogId);
+
+        if (!isDeleted) {
+            return res.status(404).json({ success: false, error: 'Blog not found' });
+        }
+
+        res.status(200).json({ success: true, message: 'Blog deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting blog:', error.message);
+        res.status(500).json({ success: false, error: 'Internal server error' });
     }
 });
 
