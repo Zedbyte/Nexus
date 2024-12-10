@@ -1,6 +1,7 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import multer from 'multer';
 
 // Import other modules as needed
 import User from './src/models/User.js';
@@ -26,14 +27,29 @@ app.options('*', (req, res) => {
 });
 
 // Middleware
-app.use(bodyParser.json());
+app.use(bodyParser.json()); 
 
 const userModel = new User();
 
-// Routes
-app.post('/api/users', async (req, res) => {
+// Configure multer for file uploads
+const upload = multer({ storage: multer.memoryStorage() }); // Store file in memory as Buffer
+
+app.post('/api/users', upload.single('profile_picture'), async (req, res) => {
     try {
-        const userId = await userModel.save(req.body);
+        const { first_name, last_name, username, phone_number, email_address, password, bio } = req.body;
+        const profile_picture = req.file ? req.file.buffer : null; // Get the binary data
+
+        const userId = await userModel.save({
+            first_name,
+            last_name,
+            username,
+            phone_number,
+            email_address,
+            password,
+            bio,
+            profile_picture, // Pass binary data to the model
+        });
+
         res.status(201).json({ success: true, userId });
     } catch (error) {
         console.error('Error saving user:', error);
@@ -67,7 +83,6 @@ async function getUserHandler(req, res) {
     }
 }
 
-
 app.put('/api/users/:id', async (req, res) => {
     try {
         const updated = await userModel.update(req.params.id, req.body);
@@ -93,6 +108,18 @@ app.delete('/api/users/:id', async (req, res) => {
     } catch (error) {
         console.error('Error deleting user:', error);
         res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.post('/api/login', async (req, res) => {
+    const { usernameOrEmail, password } = req.body;
+
+    try {
+        const user = await userModel.authenticateUser(usernameOrEmail, password);
+        res.status(200).json({ success: true, user });
+    } catch (error) {
+        console.error('Error during authentication:', error.message);
+        res.status(401).json({ success: false, error: error.message });
     }
 });
 

@@ -11,8 +11,8 @@ class User {
     }
 
     async save(data) {
-        const sql = `INSERT INTO users (first_name, last_name, username, phone_number, email_address, password, bio)
-                     VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const sql = `INSERT INTO users (first_name, last_name, username, phone_number, email_address, password, bio, profile_picture)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
         const [result] = await this.db.execute(sql, [
             data.first_name,
             data.last_name,
@@ -20,7 +20,8 @@ class User {
             data.phone_number,
             data.email_address,
             data.password, // Ensure password is hashed in production
-            data.bio
+            data.bio,
+            data.profile_picture // Binary data for LONG BLOB
         ]);
         return result.insertId;
     }
@@ -33,7 +34,7 @@ class User {
 
     async update(userId, data) {
         const sql = `UPDATE users 
-                     SET first_name = ?, last_name = ?, username = ?, phone_number = ?, email_address = ?, bio = ?
+                     SET first_name = ?, last_name = ?, username = ?, phone_number = ?, email_address = ?, bio = ?, profile_picture = ?
                      WHERE id = ?`;
         const [result] = await this.db.execute(sql, [
             data.first_name,
@@ -42,6 +43,7 @@ class User {
             data.phone_number,
             data.email_address,
             data.bio,
+            data.profile_picture, // Update profile picture
             userId
         ]);
         return result.affectedRows > 0;
@@ -52,7 +54,27 @@ class User {
         const [result] = await this.db.execute(sql, [userId]);
         return result.affectedRows > 0;
     }
+
+    async authenticateUser(usernameOrEmail, password) {
+        const sql = 'SELECT * FROM users WHERE username = ? OR email_address = ?';
+        const [rows] = await this.db.execute(sql, [usernameOrEmail, usernameOrEmail]);
+
+        const user = rows[0];
+
+        // Check if user exists
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        // Compare passwords directly (not secure)
+        if (user.password !== password) {
+            throw new Error('Invalid password');
+        }
+
+        // Return user details without password
+        const { password: _, ...userWithoutPassword } = user;
+        return userWithoutPassword;
+    }
 }
 
-// Export the User class as the default export
 export default User;

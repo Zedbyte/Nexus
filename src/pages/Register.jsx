@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Form, Button, Tabs, Tab, Alert } from 'react-bootstrap';
+import { useNavigate } from 'react-router-dom';
 
 function Register() {
     const [activeTab, setActiveTab] = useState('personal');
@@ -12,35 +13,52 @@ function Register() {
         username: '',
         password: '',
         confirmPassword: '',
-        bio: ''
+        bio: '',
+        profilePicture: null, // Add profilePicture field
     });
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value, files } = e.target;
+        if (name === 'profilePicture') {
+            setFormData({ ...formData, profilePicture: files[0] }); // Handle file input
+        } else {
+            setFormData({ ...formData, [name]: value });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('');
+        setSuccess('');
+    
         if (formData.password !== formData.confirmPassword) {
             setError('Passwords do not match');
             return;
         }
     
         try {
-            const response = await axios.post('http://localhost:3000/api/users', {
-                first_name: formData.firstName,
-                last_name: formData.lastName,
-                username: formData.username,
-                phone_number: formData.phone,
-                email_address: formData.email,
-                password: formData.password,
-                bio: formData.bio
+            const data = new FormData();
+            data.append('first_name', formData.firstName);
+            data.append('last_name', formData.lastName);
+            data.append('username', formData.username);
+            data.append('phone_number', formData.phone);
+            data.append('email_address', formData.email);
+            data.append('password', formData.password);
+            data.append('bio', formData.bio);
+            if (formData.profilePicture) {
+                data.append('profile_picture', formData.profilePicture);
+            }
+    
+            const response = await axios.post('http://localhost:3000/api/users', data, {
+                headers: { 'Content-Type': 'multipart/form-data' },
             });
     
             if (response.data.success) {
                 setSuccess('User registered successfully!');
+                setTimeout(() => navigate('/login'), 2000);
             } else {
                 setError('Registration failed.');
             }
@@ -103,6 +121,15 @@ function Register() {
                                 </Form.Group>
                             </Tab>
                             <Tab eventKey="account" title="Account Information">
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Profile Picture</Form.Label>
+                                    <Form.Control
+                                        type="file"
+                                        name="profilePicture"
+                                        accept="image/*"
+                                        onChange={handleChange}
+                                    />
+                                </Form.Group>
                                 <Form.Group className="mb-3">
                                     <Form.Label>Username</Form.Label>
                                     <Form.Control
