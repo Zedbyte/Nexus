@@ -30,11 +30,12 @@ function BlogList() {
                 }
 
                 // Make the API call with the user_id as a query parameter
-                const response = await axios.get('http://localhost:3000/api/blogs', {
+                const response = await axios.get('http://localhost:3000/api/blogs/list', {
                     params: {
-                        user_id: user.id,
+                        user_id: user.id, // Logged-in user's ID
                     },
                 });
+                
 
                 // Parse blogs and images
                 const parsedBlogs = response.data.map((blog) => ({

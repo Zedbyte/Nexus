@@ -18,12 +18,10 @@ function Home() {
             setError('');
 
             try {
-                const response = await axios.get('http://localhost:3000/api/blogs', {
-                    params: { privacy: 'public', limit: 3 }, // Fetch latest 3 blogs
-                });
+                const response = await axios.get('http://localhost:3000/api/blogs/home');
 
                 // Only take the first 3 blogs
-                setLatestBlogs(response.data.slice(0, 3));
+                setLatestBlogs(response.data.slice(0));
             } catch (err) {
                 console.error('Error fetching public blogs:', err);
                 setError('Failed to load blogs. Please try again later.');
