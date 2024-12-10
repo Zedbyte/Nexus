@@ -47,7 +47,7 @@ class Blog {
             params.push(filters.user_id);
         }
     
-        sql += `)`;
+        sql += `)`; // Close the WHERE condition
     
         // Apply specific privacy filter if provided
         if (filters.privacy) {
@@ -57,10 +57,30 @@ class Blog {
     
         sql += ` ORDER BY blogs.created_at DESC`; // Latest blogs first
     
+        // Apply limit if provided
+        if (filters.limit) {
+            sql += ` LIMIT ?`;
+            params.push(filters.limit);
+        }
+    
         const [rows] = await this.db.execute(sql, params);
         return rows;
     }
     
+
+    async fetchAllBlogs() {
+        const sql = `
+            SELECT 
+                blogs.*, 
+                CONCAT(users.first_name, ' ', users.last_name) AS author
+            FROM blogs
+            INNER JOIN users ON blogs.user_id = users.id
+            ORDER BY blogs.created_at DESC
+        `;
+    
+        const [rows] = await this.db.execute(sql);
+        return rows;
+    }
 
     // Fetch a single blog by ID
     async fetchBlogById(blogId) {

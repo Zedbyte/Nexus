@@ -153,9 +153,19 @@ app.post('/api/blogs', upload.single('image'), async (req, res) => {
 // Fetch all blogs with optional filters
 app.get('/api/blogs', async (req, res) => {
     try {
+
+        const query = req.query.q;
+
+        if (query === 'all') {
+            // Fetch all blogs regardless of user_id
+            const blogs = await blogModel.fetchAllBlogs(); // Call the new model method
+            return res.status(200).json(blogs);
+        }
+
         const filters = {
             privacy: req.query.privacy,
-            user_id: req.query.user_id
+            user_id: req.query.user_id,
+            limit: req.query.limit ? parseInt(req.query.limit, 10) : null, // Parse limit if provided
         };
 
         const blogs = await blogModel.fetchBlogs(filters);
