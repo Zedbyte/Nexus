@@ -35,7 +35,6 @@ function EditProfile() {
             });
         }
     };
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -48,12 +47,18 @@ function EditProfile() {
             formData.append('username', profile.username);
             formData.append('password', profile.password);
             formData.append('bio', profile.bio);
-    
+
             // Append the File object directly if a new file is selected
             if (profile.profile_picture instanceof File) {
                 formData.append('profile_picture', profile.profile_picture);
+            } else if (profile.profile_picture) {
+                // Send the existing picture as a hidden field value
+                formData.append('existing_profile_picture', profile.profile_picture);
             }
-    
+
+            console.log(profile.profile_picture);
+            
+
             await axios.put(`http://localhost:3000/api/profile/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
@@ -63,7 +68,6 @@ function EditProfile() {
             setError('Failed to update profile.');
         }
     };
-    
 
     if (loading) return <p>Loading...</p>;
     if (error) return <Alert variant="danger">{error}</Alert>;
@@ -95,9 +99,12 @@ function EditProfile() {
                         </Form.Group>
                         <Form.Group className="mb-3">
                             <Form.Label>Profile Picture</Form.Label>
-                            {profile.profile_picture_preview && (
+                            {(profile.profile_picture_preview || profile.profile_picture) && (
                                 <Image
-                                    src={profile.profile_picture_preview}
+                                    src={
+                                        profile.profile_picture_preview ||
+                                        profile.profile_picture // Existing picture as fallback
+                                    }
                                     alt="Profile Preview"
                                     roundedCircle
                                     className="mb-3"

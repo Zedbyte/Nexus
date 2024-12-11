@@ -380,10 +380,30 @@ app.get('/api/profile/fill/:id', async (req, res) => {
 app.put('/api/profile/:id', upload.single('profile_picture'), async (req, res) => {
     try {
         const { id } = req.params;
-        const { first_name, last_name, email_address, phone_number, username, password, bio } = req.body;
+        const {
+            first_name,
+            last_name,
+            email_address,
+            phone_number,
+            username,
+            password,
+            bio,
+            existing_profile_picture, // Base64 string or current file reference
+        } = req.body;
 
-        // Use req.file.buffer to get the binary data of the uploaded file
-        const profile_picture = req.file ? req.file.buffer : null;
+        let profile_picture;
+
+        if (req.file) {
+            // A new file was uploaded
+            profile_picture = req.file.buffer; // Use binary buffer
+        } else if (existing_profile_picture && existing_profile_picture.startsWith('data:image/')) {
+            // Base64 string detected; decode it to binary
+            const base64Data = existing_profile_picture.split(',')[1];
+            profile_picture = Buffer.from(base64Data, 'base64');
+        } else {
+            // No change to profile picture
+            profile_picture = null; // Keep the existing value as is in the database
+        }
 
         // Validate input
         if (!first_name || !last_name || !email_address || !phone_number || !username || !password) {
@@ -399,7 +419,7 @@ app.put('/api/profile/:id', upload.single('profile_picture'), async (req, res) =
             username,
             password,
             bio,
-            profile_picture, // Include binary data for profile_picture
+            profile_picture, // Pass the appropriate profile picture value
         });
 
         if (!updateResult) {
@@ -412,6 +432,8 @@ app.put('/api/profile/:id', upload.single('profile_picture'), async (req, res) =
         res.status(500).json({ success: false, error: 'Internal server error.' });
     }
 });
+
+
 
 
 // Start Server
