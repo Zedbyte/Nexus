@@ -1,4 +1,4 @@
-# Project Title: Blogging Platform
+# Project Title: Nexus
 
 ## Overview
 This project is a feature-rich blogging platform designed to provide a seamless experience for both public users and registered members. Built using React for the frontend and Node.js with Express for the backend, the application incorporates modern technologies and tools to deliver a robust and user-friendly system.
