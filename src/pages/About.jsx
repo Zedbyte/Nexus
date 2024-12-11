@@ -7,21 +7,12 @@ function BlogAboutPage() {
             {/* Hero Section */}
             <div className="hero-section text-center py-5" style={{ backgroundColor: '#f9fafe' }}>
                 <Container>
-                    <p className="text-primary fw-bold">Working for your success</p>
                     <h1 className="display-4 fw-bold">
-                        Welcome to Our Blog <br /> <span className="text-primary">Where Stories Come Alive</span>
+                        About Our Blog
                     </h1>
                     <p className="mt-3">
-                        Dive into a world of insights, tips, and stories crafted to inspire and educate. Our blog connects you with the latest trends in technology, design, and innovation.
+                        Dive into a world of insights, tips, and stories crafted to inspire and educate. <br /> Our blog connects you with the latest trends in technology, design, and innovation.
                     </p>
-                    <div className="mt-4">
-                        <Button variant="primary" size="lg" className="me-3">
-                            Explore Blogs
-                        </Button>
-                        <Button variant="outline-primary" size="lg">
-                            Watch Insights
-                        </Button>
-                    </div>
                 </Container>
             </div>
 
@@ -121,7 +112,7 @@ function BlogAboutPage() {
                                     <Card.Title>Don Henessy David</Card.Title>
                                     <Card.Subtitle className="mb-2 text-muted">Founder & Lead Writer</Card.Subtitle>
                                     <Card.Text>
-                                        John is a visionary leader with a passion for technology and storytelling.
+                                        Don is a visionary leader with a passion for technology and storytelling.
                                     </Card.Text>
                                 </Card.Body>
                             </Card>
@@ -140,7 +131,7 @@ function BlogAboutPage() {
                                     <Card.Title>Mark Jerome Santos</Card.Title>
                                     <Card.Subtitle className="mb-2 text-muted">Senior Editor</Card.Subtitle>
                                     <Card.Text>
-                                        Jane brings her expertise in content creation and design to the team.
+                                        Mark brings her expertise in content creation and design to the team.
                                     </Card.Text>
                                 </Card.Body>
                             </Card>
@@ -159,7 +150,7 @@ function BlogAboutPage() {
                                     <Card.Title>Marcus Jeremy Cariño</Card.Title>
                                     <Card.Subtitle className="mb-2 text-muted">Content Strategist</Card.Subtitle>
                                     <Card.Text>
-                                        Mike ensures every piece of content is impactful and engaging.
+                                        Marcus ensures every piece of content is impactful and engaging.
                                     </Card.Text>
                                 </Card.Body>
                             </Card>

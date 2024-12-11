@@ -2,13 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { Buffer } from 'buffer';
-import { Container, Row, Col, Card, Spinner, Alert, Image, Form, Button, Modal } from 'react-bootstrap';
+import { Container, Row, Col, Card, Spinner, Alert, Image, Button, Modal } from 'react-bootstrap';
 
 // Utility function to parse image data
 const parseImage = (imageData) => {
     return imageData
         ? `data:image/jpeg;base64,${Buffer.from(imageData.data).toString('base64')}`
-        : null;
+        : 'https://via.placeholder.com/150'; // Placeholder for missing images
 };
 
 function Profile() {
@@ -101,47 +101,57 @@ function Profile() {
     return (
         <Container className="mt-4">
             <Row>
+                {/* Profile Section */}
                 <Col md={4}>
-                    <Card className="shadow-lg">
+                    <Card className="shadow-lg border-0">
                         <Card.Body className="text-center">
-                            {profile.profile_picture && (
-                                <Image
-                                    src={profile.profile_picture}
-                                    alt={profile.name}
-                                    roundedCircle
-                                    className="mb-3"
-                                    style={{ width: '150px', height: '150px' }}
-                                />
-                            )}
-                            <h4>{profile.name || 'Unknown User'}</h4>
-                            <h5 className="text-muted">{profile.username}</h5>
-                            <p className="text-muted">{profile.email}</p>
-                            <p className="text-muted">{profile.phone_number}</p>
-                            <p className="text-muted">{profile.bio || 'No bio provided.'}</p>
-
-                            <Form>
-                                <div className="d-flex gap-2 justify-content-center">
-                                    <Button
-                                        variant="secondary"
-                                        onClick={() => navigate(`/edit-profile/${profile.id}`)}
-                                    >
-                                        Edit Profile
-                                    </Button>
-                                </div>
-                            </Form>
+                            <Image
+                                src={profile.profile_picture}
+                                alt={profile.name}
+                                roundedCircle
+                                className="mb-3"
+                                style={{ width: '150px', height: '150px', border: '4px solid #f0f0f0' }}
+                            />
+                            <h4 className="fw-bold mb-1">{profile.name || 'Unknown User'}</h4>
+                            <p className="text-muted">@{profile.username || 'username'}</p>
+                            <hr />
+                            <p className="mb-2">
+                                <strong>Email:</strong> {profile.email}
+                            </p>
+                            <p className="mb-2">
+                                <strong>Phone:</strong> {profile.phone || 'N/A'}
+                            </p>
+                            <p className="mb-3">
+                                <strong>Bio:</strong> {profile.bio || 'No bio provided.'}
+                            </p>
+                            <Button
+                                variant="primary"
+                                className="w-100 fw-bold mb-3"
+                                onClick={() => navigate(`/edit-profile/${profile.id}`)}
+                            >
+                                Edit Profile
+                            </Button>
+                            <hr />
+                            <div className="text-start">
+                                <h6 className="fw-bold">Achievements</h6>
+                                <p className="text-muted">🏆 Contributor of the Month</p>
+                                <p className="text-muted">📚 Published numerous Blogs</p>
+                            </div>
                         </Card.Body>
                     </Card>
                 </Col>
+
+                {/* Blogs Section */}
                 <Col md={8}>
-                    <h4 className="mb-4">Blogs</h4>
+                    <h4 className="mb-4 fw-bold">Your Blogs</h4>
                     {blogs.length > 0 ? (
                         blogs.map((blog) => (
-                            <Card className="mb-4 shadow-sm" key={blog.id}>
-                                <Card.Header className="d-flex justify-content-between align-items-center">
-                                    <strong>{blog.title}</strong>
+                            <Card className="mb-4 shadow-sm border-0" key={blog.id}>
+                                <Card.Header className="d-flex justify-content-between align-items-center bg-light">
+                                    <h5 className="fw-bold">{blog.title}</h5>
                                     <div>
                                         <Button
-                                            variant="info"
+                                            variant="outline-primary"
                                             size="sm"
                                             className="me-2"
                                             onClick={() => navigate(`/view-blog/${blog.id}`)}
@@ -149,7 +159,7 @@ function Profile() {
                                             View
                                         </Button>
                                         <Button
-                                            variant="warning"
+                                            variant="outline-warning"
                                             size="sm"
                                             className="me-2"
                                             onClick={() => navigate(`/edit-blog/${blog.id}`)}
@@ -157,7 +167,7 @@ function Profile() {
                                             Edit
                                         </Button>
                                         <Button
-                                            variant="danger"
+                                            variant="outline-danger"
                                             size="sm"
                                             onClick={() => handleDeleteClick(blog.id)}
                                         >
@@ -166,7 +176,12 @@ function Profile() {
                                     </div>
                                 </Card.Header>
                                 {blog.image && (
-                                    <Card.Img variant="top" src={blog.image} alt={blog.title} />
+                                    <Card.Img
+                                        variant="top"
+                                        src={blog.image}
+                                        alt={blog.title}
+                                        style={{ objectFit: 'cover', height: '150px' }}
+                                    />
                                 )}
                                 <Card.Body>
                                     <div

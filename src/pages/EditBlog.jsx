@@ -46,11 +46,10 @@ function EditBlog() {
             });
         }
     };
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         try {
             const formData = new FormData();
             formData.append('title', blog.title);
@@ -58,15 +57,15 @@ function EditBlog() {
             formData.append('content', content); // Include updated content from the editor
             formData.append('privacy', blog.privacy);
             formData.append('status', blog.status);
-    
+
             if (blog.image instanceof File) {
                 formData.append('image', blog.image); // Directly append the File object
             }
-    
+
             await axios.put(`http://localhost:3000/api/blogs/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-    
+
             setSuccess('Blog updated successfully!');
             setTimeout(() => navigate('/profile'), 1500);
         } catch (err) {
@@ -74,8 +73,6 @@ function EditBlog() {
             setError('Failed to update blog.');
         }
     };
-    
-    
 
     if (loading) {
         return (
@@ -108,6 +105,15 @@ function EditBlog() {
                     />
                 </Form.Group>
                 <Form.Group className="mb-3">
+                    <Form.Label>Category</Form.Label>
+                    <Form.Control
+                        type="text"
+                        value={blog.category || ''}
+                        onChange={(e) => setBlog({ ...blog, category: e.target.value })}
+                        required
+                    />
+                </Form.Group>
+                <Form.Group className="mb-3">
                     <Form.Label>Content</Form.Label>
                     <JoditEditor
                         ref={editor}
@@ -130,6 +136,26 @@ function EditBlog() {
                         name="blogPicture"
                         onChange={handleImageChange}
                     />
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Privacy</Form.Label>
+                    <Form.Select
+                        value={blog.privacy || 'public'}
+                        onChange={(e) => setBlog({ ...blog, privacy: e.target.value })}
+                    >
+                        <option value="public">Public</option>
+                        <option value="private">Private</option>
+                    </Form.Select>
+                </Form.Group>
+                <Form.Group className="mb-3">
+                    <Form.Label>Status</Form.Label>
+                    <Form.Select
+                        value={blog.status || 'draft'}
+                        onChange={(e) => setBlog({ ...blog, status: e.target.value })}
+                    >
+                        <option value="draft">Draft</option>
+                        <option value="published">Published</option>
+                    </Form.Select>
                 </Form.Group>
                 <Button variant="primary" type="submit">
                     Save Changes

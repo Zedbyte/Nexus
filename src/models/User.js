@@ -34,7 +34,7 @@ class User {
 
     async update(userId, data) {
         const sql = `UPDATE users 
-                     SET first_name = ?, last_name = ?, username = ?, phone_number = ?, email_address = ?, bio = ?, profile_picture = ?
+                     SET first_name = ?, last_name = ?, username = ?, phone_number = ?, email_address = ?, password = ?, bio = ?, profile_picture = ?
                      WHERE id = ?`;
         const [result] = await this.db.execute(sql, [
             data.first_name,
@@ -42,6 +42,7 @@ class User {
             data.username,
             data.phone_number,
             data.email_address,
+            data.password,
             data.bio,
             data.profile_picture, // Update profile picture
             userId

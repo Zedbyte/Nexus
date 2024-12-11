@@ -7,15 +7,13 @@ function Blog() {
     const [posts, setPosts] = useState([]);
     const [title, setTitle] = useState('');
     const [category, setCategory] = useState('');
-    // const [content, setContent] = useState('');
     const [image, setImage] = useState(null);
     const [privacy, setPrivacy] = useState('public');
     const [status, setStatus] = useState('draft');
     const [error, setError] = useState('');
     const [success, setSuccess] = useState('');
     const editor = useRef(null);
-	const [content, setContent] = useState('');
-
+    const [content, setContent] = useState('');
 
     const handleImageChange = (e) => {
         if (e.target.files && e.target.files[0]) {
@@ -24,31 +22,30 @@ function Blog() {
             setImage(null); // Clear image if no file is selected
         }
     };
-    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setSuccess('');
-    
+
         // Validate required fields
         if (!title || !content || !category) {
             setError('Title, content, and category are required.');
             return;
         }
-    
+
         try {
             const formData = new FormData();
             formData.append('title', title);
             formData.append('category', category);
             formData.append('content', content);
-    
+
             // Add image if available
             if (image) formData.append('image', image);
-    
+
             formData.append('privacy', privacy);
             formData.append('status', status);
-    
+
             // Dynamically fetch user ID from local storage or context
             const user = JSON.parse(localStorage.getItem('user'));
             if (user && user.id) {
@@ -57,13 +54,13 @@ function Blog() {
                 setError('User not authenticated. Please log in.');
                 return;
             }
-    
+
             const response = await axios.post('http://localhost:3000/api/blogs', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
             });
-    
+
             if (response.data.success) {
                 setSuccess('Blog post added successfully!');
                 setPosts((prevPosts) => [...prevPosts, response.data]); // Add new post to the list
@@ -82,90 +79,97 @@ function Blog() {
             setError('An error occurred while submitting the blog post.');
         }
     };
-    
-    
 
     return (
-        <Container className="mt-4">
-            <Row>
-                {/* <Col md={8}>
-                    <h2>Blog Posts</h2>
-                    {posts.map((post, index) => (
-                        <Card key={index} className="mb-3">
-                            <Card.Body>
-                                <Card.Title>{post.title}</Card.Title>
-                                <Card.Subtitle className="mb-2 text-muted">{post.category}</Card.Subtitle>
-                                <Card.Text>{post.content}</Card.Text>
-                                {post.image && <Card.Img src={`data:image/jpeg;base64,${post.image}`} alt={post.title} />}
-                                <Card.Text>
-                                    <small className="text-muted">{post.privacy}</small>
-                                </Card.Text>
-                            </Card.Body>
-                        </Card>
-                    ))}
-                </Col> */}
-                <Col md={12}>
-                    <h2>Add New Post</h2>
-                    {error && <Alert variant="danger">{error}</Alert>}
-                    {success && <Alert variant="success">{success}</Alert>}
-                    <Form onSubmit={handleSubmit}>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Title</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Category</Form.Label>
-                            <Form.Control
-                                type="text"
-                                value={category}
-                                onChange={(e) => setCategory(e.target.value)}
-                                required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Content</Form.Label>
-                            <JoditEditor
-                                ref={editor}
-                                value={content}
-                                tabIndex={1} // tabIndex of textarea
-                                onBlur={newContent => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
-                                onChange={newContent => {}}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Image (optional)</Form.Label>
-                            <Form.Control
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageChange}
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Privacy</Form.Label>
-                            <Form.Select value={privacy} onChange={(e) => setPrivacy(e.target.value)}>
-                                <option value="public">Public</option>
-                                <option value="private">Private</option>
-                            </Form.Select>
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Status</Form.Label>
-                            <Form.Select value={status} onChange={(e) => setStatus(e.target.value)}>
-                                <option value="draft">Draft</option>
-                                <option value="published">Published</option>
-                            </Form.Select>
-                        </Form.Group>
-                        <Button variant="primary" type="submit">
-                            Add Post
-                        </Button>
-                    </Form>
-                </Col>
-            </Row>
-        </Container>
+        <div>
+            {/* Hero Section */}
+            <div className="hero-section text-center py-5" style={{ backgroundColor: '#f9fafe' }}>
+                <Container>
+                    <h1 className="display-4 fw-bold">
+                        Create Your Blog <br />
+                        <span className="text-primary">Share Your Story</span>
+                    </h1>
+                    <p className="mt-3">
+                        Join our community of writers and share your ideas, experiences, and stories with the world.
+                        Let your voice be heard!
+                    </p>
+                </Container>
+            </div>
+
+            {/* Blog Form Section */}
+            <Container className="mt-4">
+                <Row>
+                    <Col md={12}>
+                        <h2 className="mb-4">Add New Post</h2>
+                        {error && <Alert variant="danger">{error}</Alert>}
+                        {success && <Alert variant="success">{success}</Alert>}
+                        <Form onSubmit={handleSubmit}>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Title</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                    required
+                                    placeholder="Enter the title of your blog"
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Category</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    required
+                                    placeholder="Enter the category"
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Content</Form.Label>
+                                <JoditEditor
+                                    ref={editor}
+                                    value={content}
+                                    tabIndex={1} // tabIndex of textarea
+                                    onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
+                                    onChange={(newContent) => {}}
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Image (optional)</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                />
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Privacy</Form.Label>
+                                <Form.Select
+                                    value={privacy}
+                                    onChange={(e) => setPrivacy(e.target.value)}
+                                >
+                                    <option value="public">Public</option>
+                                    <option value="private">Private</option>
+                                </Form.Select>
+                            </Form.Group>
+                            <Form.Group className="mb-3">
+                                <Form.Label>Status</Form.Label>
+                                <Form.Select
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                >
+                                    <option value="draft">Draft</option>
+                                    <option value="published">Published</option>
+                                </Form.Select>
+                            </Form.Group>
+                            <Button variant="primary" type="submit">
+                                Add Post
+                            </Button>
+                        </Form>
+                    </Col>
+                </Row>
+            </Container>
+        </div>
     );
 }
 

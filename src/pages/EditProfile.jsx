@@ -48,12 +48,18 @@ function EditProfile() {
             formData.append('username', profile.username);
             formData.append('password', profile.password);
             formData.append('bio', profile.bio);
-    
+
             // Append the File object directly if a new file is selected
             if (profile.profile_picture instanceof File) {
                 formData.append('profile_picture', profile.profile_picture);
+            } else if (profile.profile_picture) {
+                // Send the existing picture as a hidden field value
+                formData.append('existing_profile_picture', profile.profile_picture);
             }
-    
+
+            console.log(profile.profile_picture);
+            
+
             await axios.put(`http://localhost:3000/api/profile/${id}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
@@ -75,6 +81,57 @@ function EditProfile() {
                     <h3>Edit Profile</h3>
                     {success && <Alert variant="success">{success}</Alert>}
                     <Form onSubmit={handleSubmit}>
+
+                    <Form.Group className="mb-3 text-center">
+                        <Form.Label className="fw-bold">Profile Picture</Form.Label>
+                        <div className="d-flex flex-column align-items-center">
+                            {(profile.profile_picture_preview || profile.profile_picture) ? (
+                                <Image
+                                    src={
+                                        profile.profile_picture_preview ||
+                                        profile.profile_picture // Existing picture as fallback
+                                    }
+                                    alt="Profile Preview"
+                                    roundedCircle
+                                    className="mb-3"
+                                    style={{ width: '150px', height: '150px', objectFit: 'cover', border: '3px solid #ddd' }}
+                                />
+                            ) : (
+                                <div
+                                    className="mb-3"
+                                    style={{
+                                        width: '550px',
+                                        height: '150px',
+                                        border: '2px dashed #ddd',
+                                        borderRadius: '50%',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        backgroundColor: '#f9f9f9',
+                                        color: '#aaa',
+                                        fontSize: '14px',
+                                    }}
+                                >
+                                    No Image
+                                </div>
+                            )}
+                            <Form.Control
+                                type="file"
+                                accept="image/*"
+                                name="profilePicture"
+                                onChange={handleFileChange}
+                                className="mt-2"
+                                style={{
+                                    width: '100%',
+                                    textAlign: 'center',
+                                    backgroundColor: '#f8f9fa',
+                                    border: '1px solid #ced4da',
+                                    borderRadius: '4px',
+                                }}
+                            />
+                        </div>
+                    </Form.Group>
+
                         <Form.Group className="mb-3">
                             <Form.Label>First Name</Form.Label>
                             <Form.Control
@@ -91,24 +148,6 @@ function EditProfile() {
                                 value={profile.last_name || ''}
                                 onChange={(e) => setProfile({ ...profile, last_name: e.target.value })}
                                 required
-                            />
-                        </Form.Group>
-                        <Form.Group className="mb-3">
-                            <Form.Label>Profile Picture</Form.Label>
-                            {profile.profile_picture_preview && (
-                                <Image
-                                    src={profile.profile_picture_preview}
-                                    alt="Profile Preview"
-                                    roundedCircle
-                                    className="mb-3"
-                                    style={{ width: '100px', height: '100px' }}
-                                />
-                            )}
-                            <Form.Control
-                                type="file"
-                                accept="image/*"
-                                name="profilePicture"
-                                onChange={handleFileChange}
                             />
                         </Form.Group>
                         <Form.Group className="mb-3">
